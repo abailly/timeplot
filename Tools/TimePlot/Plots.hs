@@ -25,7 +25,10 @@ import Data.Colour.Names
 import Tools.TimePlot.Types
 import qualified Tools.TimePlot.Incremental as I
 
-type PlotGen = String -> LocalTime -> LocalTime -> I.StreamSummary (LocalTime, InEvent) PlotData
+type PlotGen = String        -- name of the plot
+               -> LocalTime  -- start time ?
+               -> LocalTime  -- end time ?
+               -> I.StreamSummary (LocalTime, InEvent) PlotData -- resulting streaam
 
 initGen :: ChartKind LocalTime -> PlotGen
 initGen (KindACount bs)         = genActivity (\sns n -> n) bs
@@ -91,7 +94,7 @@ edges _              = Nothing
 
 ------------------- Lines ----------------------
 genLines :: PlotGen
-genLines name t0 t1 = I.filterMap values $ (data2plot . groupByTrack) <$> I.collect
+genLines name _ _ = I.filterMap values $ (data2plot . groupByTrack) <$> I.collect
   where
     data2plot vss = PlotLinesData {
         plotName = name,
@@ -102,7 +105,7 @@ genLines name t0 t1 = I.filterMap values $ (data2plot . groupByTrack) <$> I.coll
 
 ------------------- Dots ----------------------
 genDots :: Double -> PlotGen
-genDots alpha name t0 t1 = I.filterMap values $ (data2plot . groupByTrack) <$> I.collect
+genDots alpha name _ _ = I.filterMap values $ (data2plot . groupByTrack) <$> I.collect
   where
     data2plot vss = PlotDotsData {
         plotName = name,
